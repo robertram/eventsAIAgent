@@ -9,7 +9,7 @@ export const googleSheetEnvSchema = z.object({
 
 export type nasaConfig = z.infer<typeof googleSheetEnvSchema>;
 
-export async function validateNasaConfig(
+export async function validateGoogleSheetConfig(
     runtime: IAgentRuntime
 ): Promise<nasaConfig> {
     try {
