@@ -8,18 +8,24 @@ import {
     State,
 } from "@elizaos/core";
 import { validateGoogleSheetConfig } from "../environment";
-import { readSheetDataExamples } from "../examples";
-import { createGoogleSheetsService } from "../services";
+import { readDataExamples } from "../examples";
 
-export const getGoogleSheetAction: Action = {
-    name: "GOOGLE_SHEET_GET_DATA",
+export const getGoogleListAction: Action = {
+    name: "GET_GOOGLE_SHEET_DATA",
     similes: [
         "LIST",
         "DATA",
         "EVENTS",
-        "SHEET"
+        "SHEET",
+        "SPREADSHEET",
+        "ROWS",
+        "COLUMNS",
+        "TABLE",
+        "GOOGLE SHEET",
+        "EXCEL",
+        "SHEET DATA"
     ],
-    description: "Get the Google Sheet Data.",
+    description: "Get google sheet data",
     validate: async (runtime: IAgentRuntime) => {
         await validateGoogleSheetConfig(runtime);
         return true;
@@ -32,31 +38,34 @@ export const getGoogleSheetAction: Action = {
         callback: HandlerCallback
     ) => {
 
-        const config = await validateGoogleSheetConfig(runtime);
-        const googleSheetService = createGoogleSheetsService();
+        //const config = await validateNasaConfig(runtime);
+        // const nasaService = createNASAService(
+        //     config.NASA_API_KEY
+        // );
+
+        elizaLogger.log('Logging google sheet data')
 
         try {
-            // const APODData = await nasaService.getAPOD();
-            const data = await googleSheetService.getList();
-            console.log('data', data)
+            //const MarsRoverData = await nasaService.getMarsRoverPhoto();
             elizaLogger.success(
-                `Successfully fetched google sheet data`
+                `Successfully fetched Google Sheet Data`
             );
             if (callback) {
                 callback({
-                    text: `Here is the google sheet data: `
+                    text: `
+                    Here is your google sheet data
+                    `
                 });
-                //${APODData.url}
                 return true;
             }
         } catch (error:any) {
             elizaLogger.error("Error in Google Sheet plugin handler:", error);
             callback({
-                text: `Error fetching Google Sheet Data: ${error.message}`,
+                text: `Error fetching Google Sheet list: ${error.message}`,
                 content: { error: error.message },
             });
             return false;
         }
     },
-    examples: readSheetDataExamples as ActionExample[][],
+    examples: readDataExamples as ActionExample[][],
 } as Action;
