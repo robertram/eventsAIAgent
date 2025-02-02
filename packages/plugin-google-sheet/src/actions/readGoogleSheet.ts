@@ -9,6 +9,7 @@ import {
 } from "@elizaos/core";
 import { validateGoogleSheetConfig } from "../environment";
 import { readDataExamples } from "../examples";
+import { createGoogleSheetsService } from "../services";
 
 export const getGoogleListAction: Action = {
     name: "GET_GOOGLE_SHEET_DATA",
@@ -45,10 +46,16 @@ export const getGoogleListAction: Action = {
 
         elizaLogger.log('Logging google sheet data')
 
+        const googleSheetService = createGoogleSheetsService();
+
         try {
             //const MarsRoverData = await nasaService.getMarsRoverPhoto();
+
+            const data = await googleSheetService.getList();
+            console.log('data', data)
+
             elizaLogger.success(
-                `Successfully fetched Google Sheet Data`
+                `Successfully fetched Google Sheet Data ${data}`
             );
             if (callback) {
                 callback({
