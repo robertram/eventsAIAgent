@@ -107,38 +107,6 @@ export const getGoogleListAction: Action = {
                     data.values.slice(1).map(row => `- ${row[0]}: ${row[1]}`).join('\n');
             }
 
-            // Extract the requested user index (first, second, third, etc.)
-            // const match = userRequest.match(/(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth)/);
-            // const positionMap: Record<string, number> = {
-            //     first: 0,
-            //     second: 1,
-            //     third: 2,
-            //     fourth: 3,
-            //     fifth: 4,
-            //     sixth: 5,
-            //     seventh: 6,
-            //     eighth: 7,
-            //     ninth: 8,
-            //     tenth: 9,
-            // };
-
-            // console.log('match', match);
-
-            // let requestedIndex = match ? positionMap[match[0]] : null;
-
-            // console.log('requestedIndex', requestedIndex)
-
-            // if (requestedIndex !== null && requestedIndex < data.length) {
-            //     const user = data[requestedIndex];
-            //     responseText = `The requested user is: ${user.nombre} - ${user.fecha}`;
-            // } else if (requestedIndex !== null) {
-            //     responseText = "There are not enough users in the list.";
-            // }
-
-            // elizaLogger.success(`Successfully fetched Google Sheet Data ${data}`);
-            // callback?.({
-            //     text: `Here is your google sheet data`
-            // });
             elizaLogger.success(`Responding with: ${responseText}`);
             callback?.({ text: responseText });
             return true;
