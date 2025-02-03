@@ -18,7 +18,6 @@ export async function validateGoogleSheetConfig(
             GOOGLE_SHEET_CLIENT_SECRET: runtime.getSetting("GOOGLE_SHEET_CLIENT_SECRET"),
             GOOGLE_SHEET_REFRESH_TOKEN: runtime.getSetting("GOOGLE_SHEET_REFRESH_TOKEN"),
         };
-        console.log('config: ', config)
         return googleSheetEnvSchema.parse(config);
     } catch (error) {
         console.log("error::::", error)
