@@ -94,7 +94,7 @@ export const getGoogleListAction: Action = {
 
             let responseText = "I couldn't find any relevant data.";
 
-            if(data){
+            if (data){
                 responseText = `The requested users are:\n` +
                     data.values.slice(1).map(row => `- ${row[0]}: ${row[1]}`).join('\n');
             }
