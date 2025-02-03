@@ -13,46 +13,29 @@ import {
 import { validateGoogleSheetConfig } from "../environment";
 import { createGoogleSheetsService } from "../services";
 
-const getSheetDataTemplate = `
-Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined.
+const addItemTemplate = `Respond with a JSON markdown block containing only the extracted values. Use "NA" for any values that cannot be determined.
 
-Extract the following details from the Google Sheet data:
-- name
-- email
+Analyze the values based on the provided message. Extract the following information:
+The name of the user
+The email of the user
 
-The Google Sheets data follows this structure:
-[
-    { "name": "Name", "email": "email@gmail.com" },
-]
-
-Example requests and responses:
-
-**Request:** "Give me the users information"
+Example response:
 \`\`\`json
-[
-    {
-        "nombre": "Robert",
-        "email": "email@gmail.com"
-    }
-]
+{
+    "name": "robert",
+    "email": "robert@gmail.com"
+}
 \`\`\`
 `;
 
-export const getGoogleListAction: Action = {
-    name: "GET_GOOGLE_SHEET_DATA",
+export const addGoogleSheetListAction: Action = {
+    name: "ADD_GOOGLE_SHEET_DATA",
     similes: [
-        "GET_GOOGLE_SHEET_DATA",
-        "GET_SHEET_DATA",
-        "GET_SHEET",
-        "GET_LIST",
-        "LIST",
-        "DATA",
-        "SHEET",
-        "GOOGLE SHEET",
-        "EXCEL",
-        "SHEET DATA"
+        "ADD_GOOGLE_SHEET_DATA",
+        "ADD_ITEM",
+        "ADD",
     ],
-    description: "Gets the google sheet data",
+    description: "Add google sheet data",
     validate: async (runtime: IAgentRuntime) => {
         await validateGoogleSheetConfig(runtime);
         return true;
@@ -64,8 +47,7 @@ export const getGoogleListAction: Action = {
         _options: { [key: string]: unknown },
         callback: HandlerCallback
     ) => {
-
-        elizaLogger.log('Logging google sheet data');
+        elizaLogger.log('Adding google sheet data');
 
         if (!state) {
             state = (await runtime.composeState(message)) as State;
@@ -75,7 +57,7 @@ export const getGoogleListAction: Action = {
 
         const deployContext = composeContext({
             state,
-            template: getSheetDataTemplate,
+            template: addItemTemplate,
         });
 
         const response = await generateObjectDeprecated({
@@ -89,23 +71,17 @@ export const getGoogleListAction: Action = {
         const googleSheetService = createGoogleSheetsService();
 
         try {
-            const data = await googleSheetService.getList();
+            const newValues = [response.nombre, response.email];
+            const data = await googleSheetService.addItemToList(newValues);
             console.log('data', data);
-
-            let responseText = "I couldn't find any relevant data.";
-
-            if(data){
-                responseText = `The requested users are:\n` +
-                    data.values.slice(1).map(row => `- ${row[0]}: ${row[1]}`).join('\n');
-            }
-
+            let responseText = "Item added to the list";
             elizaLogger.success(`Responding with: ${responseText}`);
             callback?.({ text: responseText });
             return true;
         } catch (error: any) {
             elizaLogger.error("Error in Google Sheet plugin handler:", error);
             callback({
-                text: `Error fetching Google Sheet list: ${error.message}`,
+                text: `Error adding Google Sheet list: ${error.message}`,
                 content: { error: error.message },
             });
             return false;
@@ -116,20 +92,20 @@ export const getGoogleListAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Give me the data from the list",
+                    text: "Add sheet data: Robert, robert@gmail.com, true",
                 },
             },
             {
                 user: "{{agent}}",
                 content: {
-                    text: "Sure, I'll give you the data from the list now.",
-                    action: "GET_GOOGLE_SHEET_DATA",
+                    text: "Sure, I'll add the data 'Robert, robert@gmail.com, true' to the list now.",
+                    action: "ADD_GOOGLE_SHEET_DATA",
                 },
             },
             {
                 user: "{{agent}}",
                 content: {
-                    text: "Data from the list displayed now.",
+                    text: "Successfully added the data 'Robert, robert@gmail.com, true' to the list",
                 },
             },
         ],
@@ -137,20 +113,20 @@ export const getGoogleListAction: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Get data from the sheet",
+                    text: "Add 'Robert, robert@gmail.com, true' to the sheet",
                 },
             },
             {
                 user: "{{agent}}",
                 content: {
-                    text: "Sure, I'll give you the data from the sheet",
+                    text: "Sure, I'll add the data 'Robert, robert@gmail.com, true' to the sheet now.",
                     action: "ADD_GOOGLE_SHEET_DATA",
                 },
             },
             {
                 user: "{{agent}}",
                 content: {
-                    text: "Successfully sent the data from the sheet",
+                    text: "Successfully added the data 'Robert, robert@gmail.com, true' to the sheet",
                 },
             },
         ],

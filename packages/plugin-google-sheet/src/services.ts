@@ -2,30 +2,63 @@ import { google } from 'googleapis';
 
 export const createGoogleSheetsService = () => {
     const getList = async (): Promise<any> => {
-        // Auth
+        // Authorization for reading only the spreadsheet
         const auth = await google.auth.getClient({ scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'] });
         const sheets = google.sheets({ version: 'v4', auth });
+        const range = `Hoja 1!A:P`;
 
-        // Query
-        const range = `Hoja 1!A1:C9`;
         const response: any = await sheets.spreadsheets.values.get({
             spreadsheetId: process.env.SHEET_ID,
             range,
         });
 
-        console.log('response', response);
         const values = response.data.values;
 
-        // Result
-        const [title, content] = values[1];
-        console.log(title, content);
-
         return {
-            title,
-            content,
             values
         };
     };
 
-    return { getList };
+    const addItemToList = async (newValues: any[]): Promise<any> => {
+        // Authorization for editing the spreadsheet
+        const auth = await google.auth.getClient({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
+        const sheets = google.sheets({ version: 'v4', auth });
+        const range = `Hoja 1!A:P`;
+
+        // Append values
+        const response = await sheets.spreadsheets.values.append({
+            spreadsheetId: process.env.SHEET_ID,
+            range,
+            valueInputOption: 'RAW',
+            insertDataOption: 'INSERT_ROWS',
+            requestBody: {
+                values: [newValues], // Each inner array represents a row
+            },
+        });
+
+        console.log('Update response', response);
+        return response.data;
+    };
+
+    const updateList = async (newValues: any[]): Promise<any> => {
+        // Authorization for editing the spreadsheet
+        const auth = await google.auth.getClient({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
+        const sheets = google.sheets({ version: 'v4', auth });
+
+        // Update
+        const range = `Hoja 1!A:C`;
+        const response: any = await sheets.spreadsheets.values.update({
+            spreadsheetId: process.env.SHEET_ID,
+            range,
+            valueInputOption: 'RAW',
+            requestBody: {
+                values: [newValues],
+            },
+        });
+
+        console.log('Update response', response);
+        return response.data;
+    };
+
+    return { getList, addItemToList, updateList };
 };
